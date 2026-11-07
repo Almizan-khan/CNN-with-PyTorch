@@ -1,0 +1,29 @@
+name: MNIST experiment
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/mnist-experiment.yml
+      - mnistcnn.py
+permissions:
+  contents: read
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -r requirements.txt
+      - run: python mnistcnn.py --epochs 5 --seed 42 --output outputs/mnist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mnist-experiment
+          path: outputs/mnist/
