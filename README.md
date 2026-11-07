@@ -40,9 +40,23 @@ python benchmark.py --output reports/benchmark.json
 python mnistcnn.py --epochs 2 --train-limit 10000 --test-limit 2000 --output outputs/quick-check
 ```
 
-The first command measures an untrained model's CPU forward latency on synthetic inputs, with warmup, median and p95 timing. It does not measure classification quality. The second command is explicitly a subset experiment, not a full MNIST score. The historical README's >98% claim has not been reproduced as part of this refresh and is not used as a verified result.
+The first command measures an untrained model's CPU forward latency on synthetic inputs, with warmup, median and p95 timing. It does not measure classification quality. The second command is explicitly a subset experiment, not a full MNIST score. The full five-epoch experiment below provides a reproducible result on the official test set.
 
 CI publishes its benchmark JSON as an Actions artifact. See [validation](VALIDATION.md) for test commands and [original experiment](notebooks/original_experiment.ipynb) for provenance.
+
+## Measured result
+
+![Measured experiment results](reports/results.svg)
+
+| Experiment | Result | Protocol |
+|---|---:|---|
+| MNIST test accuracy | **98.50%** | 55,000 train / 5,000 validation / 10,000 official test; seed 42; five epochs |
+| Selected validation accuracy | 98.34% | Checkpoint selected by validation loss |
+| Training time on the recorded CPU runner | 121.48 s | Two CPU threads; PyTorch 2.6.0+cpu |
+
+[Raw report and confusion matrix](reports/mnist-test.json) · [Per-digit error analysis](docs/error-analysis.md) · [Executed training run](https://github.com/Almizan-khan/CNN-with-PyTorch/actions/runs/42401091003)
+
+This is one seeded run, not a multi-seed confidence interval. The test score was computed after validation-based checkpoint selection. The workflow artifact contains the checkpoint and full metrics for as long as GitHub retains it; the committed JSON preserves the result and provenance.
 
 ## Limitations
 
